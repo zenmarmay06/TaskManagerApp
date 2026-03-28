@@ -1,0 +1,17 @@
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\bin\Debug\net9.0\TaskManager.Business.deps.json
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\bin\Debug\net9.0\TaskManager.Business.dll
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\bin\Debug\net9.0\TaskManager.Business.pdb
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\bin\Debug\net9.0\TaskManager.Core.dll
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\bin\Debug\net9.0\TaskManager.Data.dll
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\bin\Debug\net9.0\TaskManager.Core.pdb
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\bin\Debug\net9.0\TaskManager.Data.pdb
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\obj\Debug\net9.0\TaskManager.Business.csproj.AssemblyReference.cache
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\obj\Debug\net9.0\TaskManager.Business.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\obj\Debug\net9.0\TaskManager.Business.AssemblyInfoInputs.cache
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\obj\Debug\net9.0\TaskManager.Business.AssemblyInfo.cs
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\obj\Debug\net9.0\TaskManager.Business.csproj.CoreCompileInputs.cache
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\obj\Debug\net9.0\TaskMana.03078404.Up2Date
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\obj\Debug\net9.0\TaskManager.Business.dll
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\obj\Debug\net9.0\refint\TaskManager.Business.dll
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\obj\Debug\net9.0\TaskManager.Business.pdb
+C:\Users\Admin\source\repos\TaskManagerApplication\TaskManager.Business\obj\Debug\net9.0\ref\TaskManager.Business.dll
