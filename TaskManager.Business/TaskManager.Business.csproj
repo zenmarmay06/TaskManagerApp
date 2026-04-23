@@ -8,6 +8,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\TaskManager.Core\TaskManager.Core.csproj" />
 		<ProjectReference Include="..\TaskManager.Data\TaskManager.Data.csproj" />
 	</ItemGroup>
