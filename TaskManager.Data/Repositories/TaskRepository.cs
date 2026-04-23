@@ -1,87 +1,127 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TaskManager.Core.Models;
 using System.Data.SQLite;
+using System.Net.Http;
+using Newtonsoft.Json;
+using TaskManager.Core.Models;
 using TaskManager.Data.Database;
 
 namespace TaskManager.Data.Repositories
 {
     public class TaskRepository
     {
+        // 1. Pag-load sa Tasks (Gikuha ang karaan nga IsCompleted, gipulihan og Status)
         public List<TaskItem> GetTasksByUser(int userId)
+        {
+            List<TaskItem> tasks = new List<TaskItem>();
+            using var connection = DatabaseManager.GetConnection();
+            connection.Open();
+
+            string query = "SELECT * FROM Tasks WHERE UserId = @userId";
+            using var cmd = new SQLiteCommand(query, connection);
+            cmd.Parameters.AddWithValue("@userId", userId);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                tasks.Add(new TaskItem
+                {
+                    Id = Convert.ToInt32(reader["Id"]),
+                    RoomNo = reader["RoomNo"].ToString(),
+                    AssignedTo = reader["AssignedTo"].ToString(),
+                    DueDate = DateTime.Parse(reader["DueDate"].ToString()),
+                    Status = reader["Status"].ToString(), // "Pending", "In Progress", "Complete"
+                    UserId = Convert.ToInt32(reader["UserId"]),
+                    Note = reader["Note"].ToString()
+                });
+            }
+            return tasks;
+        }
+
+        public List<TaskItem> GetTasksByStaff(string staffName)
         {
             List<TaskItem> tasks = new List<TaskItem>();
 
             using var connection = DatabaseManager.GetConnection();
             connection.Open();
 
-            string query = "SELECT * FROM Tasks WHERE UserId = @userId";
-
-            SQLiteCommand cmd = new SQLiteCommand(query, connection);
-            cmd.Parameters.AddWithValue("@userId", userId);
+            string query = "SELECT * FROM Tasks WHERE AssignedTo = @staffName";
+            using var cmd = new SQLiteCommand(query, connection);
+            cmd.Parameters.AddWithValue("@staffName", staffName);
 
             using var reader = cmd.ExecuteReader();
-
             while (reader.Read())
             {
                 tasks.Add(new TaskItem
                 {
                     Id = Convert.ToInt32(reader["Id"]),
-                    Title = reader["Title"].ToString(),
-                    Description = reader["Description"].ToString(),
+                    RoomNo = reader["RoomNo"].ToString(),
+                    AssignedTo = reader["AssignedTo"].ToString(),
                     DueDate = DateTime.Parse(reader["DueDate"].ToString()),
-                    IsCompleted = Convert.ToInt32(reader["IsCompleted"]) == 1,
+                    Status = reader["Status"].ToString(),
                     UserId = Convert.ToInt32(reader["UserId"]),
-                    Priority = reader["Priority"]?.ToString()
+                    Note = reader["Note"].ToString()
                 });
             }
 
             return tasks;
         }
-        public void UpdateTask(TaskItem task)
-        {
-            using (var connection = DatabaseManager.GetConnection())
-            {
-                connection.Open();
 
-                string query = @"UPDATE Tasks 
-                         SET Title = @Title,
-                             Description = @Description,
-                             DueDate = @DueDate, 
-                             Priority = @Priority
-                         WHERE Id = @Id";
-
-                using (var command = new SQLiteCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Title", task.Title);
-                    command.Parameters.AddWithValue("@Description", task.Description);
-                    command.Parameters.AddWithValue("@DueDate", task.DueDate);
-                    command.Parameters.AddWithValue("@Id", task.Id);
-                    command.Parameters.AddWithValue("@Priority", task.Priority);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
+        // 2. Pagdugang og Task (Default status is "Pending")
         public void AddTask(TaskItem task)
         {
             using var connection = DatabaseManager.GetConnection();
             connection.Open();
 
-            string query = @"INSERT INTO Tasks (Title, Description, DueDate, IsCompleted, UserId, Priority)
-VALUES (@title, @description, @dueDate, @completed, @userId, @priority)";
+            string query = @"INSERT INTO Tasks (RoomNo, AssignedTo, DueDate, Status, UserId, Note)
+                             VALUES (@roomnum, @assign, @dueDate, @status, @userId, @note)";
 
-            SQLiteCommand cmd = new SQLiteCommand(query, connection);
-
-            cmd.Parameters.AddWithValue("@title", task.Title);
-            cmd.Parameters.AddWithValue("@description", task.Description);
+            using var cmd = new SQLiteCommand(query, connection);
+            cmd.Parameters.AddWithValue("@roomnum", task.RoomNo);
+            cmd.Parameters.AddWithValue("@assign", task.AssignedTo);
             cmd.Parameters.AddWithValue("@dueDate", task.DueDate.ToString("yyyy-MM-dd"));
-            cmd.Parameters.AddWithValue("@completed", task.IsCompleted ? 1 : 0);
+            cmd.Parameters.AddWithValue("@status", "Pending");
             cmd.Parameters.AddWithValue("@userId", task.UserId);
-            cmd.Parameters.AddWithValue("@priority", task.Priority);
+            cmd.Parameters.AddWithValue("@note", task.Note);
+
+            cmd.ExecuteNonQuery();
+        }
+
+        // 3. General Update (Para sa Edit feature)
+        public void UpdateTask(TaskItem task)
+        {
+            using var connection = DatabaseManager.GetConnection();
+            connection.Open();
+
+            string query = @"UPDATE Tasks 
+                             SET RoomNo = @RoomNo,
+                                 AssignedTo = @Assigned,
+                                 DueDate = @DueDate, 
+                                 Status = @Status,
+                                 Note = @Note
+                             WHERE Id = @Id";
+
+            using var cmd = new SQLiteCommand(query, connection);
+            cmd.Parameters.AddWithValue("@RoomNo", task.RoomNo);
+            cmd.Parameters.AddWithValue("@Assigned", task.AssignedTo);
+            cmd.Parameters.AddWithValue("@DueDate", task.DueDate.ToString("yyyy-MM-dd"));
+            cmd.Parameters.AddWithValue("@Status", task.Status);
+            cmd.Parameters.AddWithValue("@Note", task.Note);
+            cmd.Parameters.AddWithValue("@Id", task.Id);
+
+            cmd.ExecuteNonQuery();
+        }
+
+        // 4. Specific Status Update (Gamiton sa Staff inig 'Accept' o 'Complete')
+        public void UpdateTaskStatus(int taskId, string newStatus)
+        {
+            using var connection = DatabaseManager.GetConnection();
+            connection.Open();
+
+            string query = "UPDATE Tasks SET Status = @status WHERE Id = @id";
+            using var cmd = new SQLiteCommand(query, connection);
+            cmd.Parameters.AddWithValue("@status", newStatus);
+            cmd.Parameters.AddWithValue("@id", taskId);
 
             cmd.ExecuteNonQuery();
         }
@@ -90,27 +130,82 @@ VALUES (@title, @description, @dueDate, @completed, @userId, @priority)";
         {
             using var connection = DatabaseManager.GetConnection();
             connection.Open();
-
             string query = "DELETE FROM Tasks WHERE Id=@id";
-
-            SQLiteCommand cmd = new SQLiteCommand(query, connection);
+            using var cmd = new SQLiteCommand(query, connection);
             cmd.Parameters.AddWithValue("@id", taskId);
-
             cmd.ExecuteNonQuery();
         }
 
-        public void CompleteTask(int taskId)
+        // --- API METHODS PARA SA HOTEL BLUE BIRD SYNC ---
+
+        // 2. Mokuha sa listahan sa staff gikan sa API (Hotel MySQL DB)
+
+        public List<string> GetStaffByWork(string work)
+
         {
-            using var connection = DatabaseManager.GetConnection();
-            connection.Open();
 
-            string query = "UPDATE Tasks SET IsCompleted=1 WHERE Id=@id";
+            try
 
-            SQLiteCommand cmd = new SQLiteCommand(query, connection);
-            cmd.Parameters.AddWithValue("@id", taskId);
+            {
 
-            cmd.ExecuteNonQuery();
+                using (var client = new HttpClient())
+
+                {
+
+                    string url = $"http://localhost/Hotel-Management-System-main/api/get_staff.php?work={work}";
+
+                    var response = client.GetAsync(url).Result;
+
+                    if (response.IsSuccessStatusCode)
+
+                    {
+
+                        var json = response.Content.ReadAsStringAsync().Result;
+
+                        return JsonConvert.DeserializeObject<List<string>>(json);
+
+                    }
+
+                }
+
+            }
+
+            catch (Exception ex) { }
+
+            return new List<string>();
+
         }
-     
+
+
+
+        public List<string> GetRoomsByStatus(string status)
+        {
+            try
+            {
+                using var client = new HttpClient();
+                string url = $"http://localhost/Hotel-Management-System-main/api/get_rooms.php?status={status}";
+                var response = client.GetAsync(url).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = response.Content.ReadAsStringAsync().Result;
+                    return JsonConvert.DeserializeObject<List<string>>(json);
+                }
+            }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine("API Error: " + ex.Message); }
+            return new List<string>();
+        }
+
+        public void UpdateRoomStatusInHotelSystem(string roomNo, string newStatus)
+        {
+            try
+            {
+                using var client = new HttpClient();
+                string url = "http://localhost/Hotel-Management-System-main/api/update_room.php";
+                var parameters = new Dictionary<string, string> { { "roomNo", roomNo }, { "status", newStatus } };
+                var content = new FormUrlEncodedContent(parameters);
+                var response = client.PostAsync(url, content).Result;
+            }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine("Sync Error: " + ex.Message); }
+        }
     }
 }
