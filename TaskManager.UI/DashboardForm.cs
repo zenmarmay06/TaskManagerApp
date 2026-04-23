@@ -17,18 +17,6 @@ namespace TaskManager.UI
         private User _currentUser;
         private TaskService _taskService;
 
-        public event Action OnTaskChanged;
-        private void btnTasks_Click(object sender, EventArgs e)
-        {
-            TasksForm tasksForm = new TasksForm(_currentUser);
-
-            tasksForm.OnTaskChanged += () =>
-            {
-                LoadDashboard();
-            };
-
-            tasksForm.Show();
-        }
         public DashboardForm(User user)
         {
             InitializeComponent();
@@ -40,26 +28,44 @@ namespace TaskManager.UI
 
         private void LoadDashboard()
         {
+            // Pagkuha sa tasks gikan sa Service
             var tasks = _taskService.GetUserTasks(_currentUser.Id);
 
-            lblWelcome.Text = "Welcome " + _currentUser.Username;
-            lblTotalTasks.Text = "Total : " + tasks.Count();
-            lblCompletedTasks.Text = "Completed: " + tasks.Count(t => t.IsCompleted);
-            lblPendingTasks.Text = "Pending: " + tasks.Count(t => !t.IsCompleted);
-            lblOverdue.Text = "Overdue: " + tasks.Count(t => !t.IsCompleted && t.DueDate.Date < DateTime.Today);
+            // Display Welcome Message
+            lblWelcome.Text = "Welcome, " + _currentUser.Name; // Mas maayo Name para professional
 
-            lblTotalTasks.Text = "Total : " + tasks.Count();
+            // 1. Total Tasks
+            lblTotalTasks.Text = "Total: " + tasks.Count();
 
-            lblCompletedTasks.Text = "Completed: " + tasks.Count(t => t.IsCompleted);
+            // 2. Completed Tasks (Base sa string status)
+            lblCompletedTasks.Text = "Completed: " + tasks.Count(t => t.Status == "Complete");
 
+            // 3. Pending Tasks (Wala pa nasugdan)
+            lblPendingTasks.Text = "Pending: " + tasks.Count(t => t.Status == "Pending");
+
+            // 4. In Progress (Kadtong gidawat na sa staff)
+            // Note: Kung wala pa kay label para ani, pwede nimo i-add sa UI
+            // lblInProgress.Text = "In Progress: " + tasks.Count(t => t.Status == "In Progress");
+
+            // 5. Overdue (Wala pa nahuman ug lapas na sa Due Date)
             lblOverdue.Text = "Overdue: " + tasks.Count(t =>
-                !t.IsCompleted && t.DueDate.Date < DateTime.Today
-            );
-
-            lblPendingTasks.Text = "Pending: " + tasks.Count(t =>
-                !t.IsCompleted && t.DueDate.Date >= DateTime.Today
+                t.Status != "Complete" &&
+                t.DueDate.Date < DateTime.Today
             );
         }
+        private void btnTasks_Click(object sender, EventArgs e)
+        {
+            TasksForm tasksForm = new TasksForm(_currentUser);
+
+            // Inig close sa TasksForm o naay nausab, i-refresh ang dashboard
+            tasksForm.OnTaskChanged += () =>
+            {
+                LoadDashboard();
+            };
+
+            tasksForm.Show();
+        }
+       
         private void DashboardForm_Load(object sender, EventArgs e)
         {
 

@@ -28,47 +28,64 @@ namespace TaskManager.UI
             InitializeComponent();
             _taskService = new TaskService();
             _currentUser = user;
+
             LoadTasks();
+            LoadMaintenanceRooms();
+            LoadCleaners();
         }
 
         private void LoadTasks()
         {
             dgvTasks.DataSource = null;
             dgvTasks.DataSource = _taskService.GetUserTasks(_currentUser.Id);
+            HideColumns();
         }
 
         private void HideColumns()
         {
-            dgvTasks.Columns["Id"].Visible = false;
-            dgvTasks.Columns["UserId"].Visible = false;
-            dgvTasks.Columns["IsCompleted"].Visible = false;
+            if (dgvTasks.Columns["Id"] != null) dgvTasks.Columns["Id"].Visible = false;
+            if (dgvTasks.Columns["UserId"] != null) dgvTasks.Columns["UserId"].Visible = false;
+            // Gidugang nato ang IsCompleted sa pag-hide kay Status na atong gamiton
+            if (dgvTasks.Columns["IsCompleted"] != null) dgvTasks.Columns["IsCompleted"].Visible = false;
         }
 
+        private void LoadMaintenanceRooms()
+        {
+            var rooms = _taskService.GetMaintenanceRooms();
+            cbRoomNo.DataSource = rooms;
+        }
+
+        private void LoadCleaners()
+        {
+            var cleaners = _taskService.GetStaffByWork();
+            cbAssigned.DataSource = cleaners;
+        }
         private void btnAddTask_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtTitle.Text))
+
+            if (string.IsNullOrEmpty(cbRoomNo.Text))
             {
-                MessageBox.Show("Task title cannot be empty");
+                MessageBox.Show("Please select a room for maintenance.");
                 return;
             }
 
             TaskItem task = new TaskItem
             {
-                Title = txtTitle.Text,
-                Description = txtDescription.Text,
+                RoomNo = cbRoomNo.Text,
+                AssignedTo = cbAssigned.Text,
                 DueDate = dtDueDate.Value,
-                IsCompleted = false,
+                Status = "Pending", // Gigamit ang Status string
                 UserId = _currentUser.Id,
-                Priority = cmbPriority.SelectedItem?.ToString() ?? "Low",
+                Note = "" // Siguroha nga naay default note
             };
 
             _taskService.CreateTask(task);
-            txtTitle.Clear();
-            txtDescription.Clear();
-            dtDueDate.Value = DateTime.Now;
+
             LoadTasks();
-            HideColumns();
+            LoadMaintenanceRooms();
             OnTaskChanged?.Invoke();
+
+            MessageBox.Show("Task successfully assigned!");
         }
 
         private void btnDeleteTask_Click(object sender, EventArgs e)
@@ -81,25 +98,38 @@ namespace TaskManager.UI
 
             int taskId = Convert.ToInt32(dgvTasks.SelectedRows[0].Cells["Id"].Value);
             _taskService.DeleteTask(taskId);
+
             LoadTasks();
-            HideColumns();
             OnTaskChanged?.Invoke();
         }
 
-        private void btnCompleteTask_Click(object sender, EventArgs e)
-        {
-            if (dgvTasks.SelectedRows.Count == 0)
-            {
-                MessageBox.Show("Select a task first");
-                return;
-            }
+        //private void btnCompleteTask_Click(object sender, EventArgs e)
+       // {
+           // if (dgvTasks.SelectedRows.Count == 0)
+           // {
+              //  MessageBox.Show("Select a task first");
+             //   return;
+           // }
 
-            int taskId = Convert.ToInt32(dgvTasks.SelectedRows[0].Cells["Id"].Value);
-            _taskService.CompleteTask(taskId);
-            LoadTasks();
-            HideColumns();
-            OnTaskChanged?.Invoke();
-        }
+           // var row = dgvTasks.SelectedRows[0];
+           // int taskId = Convert.ToInt32(row.Cells["Id"].Value);
+           // string roomNo = row.Cells["RoomNo"].Value?.ToString();
+
+            // 1. Mark as completed sa Task Manager
+           // _taskService.CompleteTask(taskId);
+
+            // 2. I-update ang Room balik sa 'Available' sa Hotel System
+            //if (!string.IsNullOrEmpty(roomNo))
+           // {
+               // _taskService.UpdateRoomToAvailable(roomNo);
+                //MessageBox.Show($"Room {roomNo} is now Available for booking!");
+           // }
+
+           // LoadTasks();
+            //LoadMaintenanceRooms();
+            //OnTaskChanged?.Invoke();
+
+        //}
 
         private void btnEditTask_Click(object sender, EventArgs e)
         {
@@ -110,43 +140,30 @@ namespace TaskManager.UI
             }
 
             _isEditing = true;
-
             var row = dgvTasks.SelectedRows[0];
-
             int taskId = Convert.ToInt32(row.Cells["Id"].Value);
-            string currentTitle = row.Cells["Title"].Value?.ToString();
-            string currentDescription = row.Cells["Description"].Value?.ToString();
+
+            // Kuhaa ang kasamtangan nga Status ug Note para dili ma-blank
+            string currentStatus = row.Cells["Status"].Value?.ToString() ?? "Pending";
+            string currentNote = row.Cells["Note"].Value?.ToString() ?? "";
+
             DateTime currentDueDate = Convert.ToDateTime(row.Cells["DueDate"].Value);
-
-            string newTitle = string.IsNullOrWhiteSpace(txtTitle.Text) ? currentTitle : txtTitle.Text;
-            string newDescription = string.IsNullOrWhiteSpace(txtDescription.Text) ? currentDescription : txtDescription.Text;
             DateTime newDueDate = _isDateManuallyChanged ? dtDueDate.Value.Date : currentDueDate;
-
-            if (string.IsNullOrWhiteSpace(newTitle))
-            {
-                MessageBox.Show("Task title cannot be empty");
-                _isEditing = false;
-                return;
-            }
 
             TaskItem updatedTask = new TaskItem
             {
                 Id = taskId,
-                Title = newTitle,
-                Description = newDescription,
+                RoomNo = cbRoomNo.Text,
+                AssignedTo = cbAssigned.Text, // Siguroha nga naay sulod ang cbAssigned
                 DueDate = newDueDate,
+                Status = currentStatus, // KINI ANG IMPORTANTE
                 UserId = _currentUser.Id,
-                Priority = cmbPriority.SelectedItem?.ToString() ?? "Low",
+                Note = currentNote      // KINI SAB
             };
 
             _taskService.UpdateTask(updatedTask);
 
             LoadTasks();
-            HideColumns();
-
-            txtTitle.Clear();
-            txtDescription.Clear();
-
             _isEditing = false;
             _isDateManuallyChanged = false;
 
@@ -156,16 +173,15 @@ namespace TaskManager.UI
 
         private void dgvTasks_SelectionChanged(object sender, EventArgs e)
         {
-            if (_isEditing) return;
-            if (dgvTasks.SelectedRows.Count == 0) return;
+            if (_isEditing || dgvTasks.SelectedRows.Count == 0) return;
 
             _isUpdatingFromGrid = true;
-
             var row = dgvTasks.SelectedRows[0];
-            txtTitle.Text = row.Cells["Title"].Value?.ToString();
-            txtDescription.Text = row.Cells["Description"].Value?.ToString();
+
+            // I-populate ang controls base sa napili nga row
+            cbRoomNo.Text = row.Cells["RoomNo"].Value?.ToString();
+            cbAssigned.Text = row.Cells["AssignedTo"].Value?.ToString();
             dtDueDate.Value = Convert.ToDateTime(row.Cells["DueDate"].Value);
-            cmbPriority.SelectedItem = row.Cells["Priority"].Value?.ToString();
 
             _isUpdatingFromGrid = false;
             _isDateManuallyChanged = false;
@@ -179,37 +195,26 @@ namespace TaskManager.UI
 
         private void TasksForm_Load(object sender, EventArgs e)
         {
+            // Grid Styling
             dgvTasks.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvTasks.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvTasks.MultiSelect = false;
             dgvTasks.RowTemplate.Height = 36;
-
-            dgvTasks.Font = new Font("Segoe UI", 10);
-            dgvTasks.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
-
-            dgvTasks.EnableHeadersVisualStyles = false;
-            dgvTasks.BorderStyle = BorderStyle.None;
-
             dgvTasks.BackgroundColor = Color.FromArgb(20, 20, 20);
             dgvTasks.DefaultCellStyle.BackColor = Color.FromArgb(24, 24, 24);
-            dgvTasks.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(28, 28, 28);
             dgvTasks.DefaultCellStyle.ForeColor = Color.FromArgb(220, 220, 220);
-            dgvTasks.GridColor = Color.FromArgb(40, 40, 40);
-
-            dgvTasks.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(30, 30, 30);
-            dgvTasks.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-
-            dgvTasks.DefaultCellStyle.SelectionBackColor = Color.FromArgb(60, 90, 160);
-            dgvTasks.DefaultCellStyle.SelectionForeColor = Color.White;
-
-            dgvTasks.CellBorderStyle = DataGridViewCellBorderStyle.None;
             dgvTasks.RowHeadersVisible = false;
 
             HideColumns();
 
             dgvTasks.CellFormatting += dgvTasks_CellFormatting;
             dgvTasks.CellPainting += dgvTasks_CellPainting;
+
         }
+
+
+
+
 
         private void txtSearch_TextChanged(object sender, EventArgs e)
         {
@@ -218,8 +223,7 @@ namespace TaskManager.UI
 
             var filtered = tasks
                 .Where(t =>
-                    (t.Title ?? "").ToLower().Contains(search) ||
-                    (t.Description ?? "").ToLower().Contains(search))
+                            (t.RoomNo ?? "").ToLower().Contains(search))
                 .ToList();
 
             dgvTasks.DataSource = null;
@@ -230,70 +234,55 @@ namespace TaskManager.UI
         private void dgvTasks_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             if (e.RowIndex < 0) return;
-
             var row = dgvTasks.Rows[e.RowIndex];
-            bool completed = Convert.ToBoolean(row.Cells["IsCompleted"].Value ?? false);
-            DateTime dueDate = Convert.ToDateTime(row.Cells["DueDate"].Value);
-            bool isOverdue = !completed && dueDate.Date < DateTime.Today;
 
-            if (completed)
+            // Atong i-check ang Status column imbes IsCompleted
+            string status = row.Cells["Status"].Value?.ToString() ?? "Pending";
+
+            if (status == "Complete")
             {
                 row.DefaultCellStyle.ForeColor = Color.Gray;
                 row.DefaultCellStyle.Font = new Font(dgvTasks.Font, FontStyle.Strikeout);
             }
-            else if (isOverdue)
+            else if (status == "In Progress")
             {
-                row.DefaultCellStyle.ForeColor = Color.FromArgb(255, 120, 120);
-                row.DefaultCellStyle.BackColor = Color.FromArgb(40, 20, 20);
-                row.DefaultCellStyle.Font = new Font(dgvTasks.Font, FontStyle.Bold);
-            }
-            else
-            {
-                row.DefaultCellStyle.ForeColor = Color.Gainsboro;
-                row.DefaultCellStyle.BackColor = Color.FromArgb(24, 24, 24);
-                row.DefaultCellStyle.Font = new Font(dgvTasks.Font, FontStyle.Regular);
+                row.DefaultCellStyle.ForeColor = Color.LightSkyBlue;
+                row.DefaultCellStyle.Font = new Font(dgvTasks.Font, FontStyle.Italic);
             }
         }
 
         private void dgvTasks_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            if (e.RowIndex < 0 || e.ColumnIndex != dgvTasks.Columns["Priority"].Index)
-                return;
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+
+            // Siguroha nga naay column nga named "Priority" sa imong TaskItem model
+            if (dgvTasks.Columns[e.ColumnIndex].Name != "Priority") return;
 
             e.PaintBackground(e.CellBounds, true);
+            string text = e.Value?.ToString() ?? "Low";
 
-            string text = e.Value?.ToString();
-            Color bg = Color.Gray;
+            Color bg = text == "High" ? Color.FromArgb(220, 70, 70) :
+                       text == "Medium" ? Color.FromArgb(240, 170, 60) :
+                       Color.FromArgb(70, 160, 110);
 
-            if (text == "High") bg = Color.FromArgb(220, 70, 70);
-            else if (text == "Medium") bg = Color.FromArgb(240, 170, 60);
-            else if (text == "Low") bg = Color.FromArgb(70, 160, 110);
+            Rectangle rect = new Rectangle(e.CellBounds.X + 8, e.CellBounds.Y + 6, e.CellBounds.Width - 16, e.CellBounds.Height - 12);
 
-            Rectangle rect = new Rectangle(
-                e.CellBounds.X + 8,
-                e.CellBounds.Y + 6,
-                e.CellBounds.Width - 16,
-                e.CellBounds.Height - 12
-            );
-
+            // Paggamit sa helper method para sa rounded rectangles
             using (Brush b = new SolidBrush(bg))
             {
                 e.Graphics.FillRoundedRectangle(b, rect, 12);
             }
 
-            TextRenderer.DrawText(
-                e.Graphics,
-                text,
-                new Font("Segoe UI", 9, FontStyle.Bold),
-                rect,
-                Color.White,
-                TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter
-            );
-
+            TextRenderer.DrawText(e.Graphics, text, new Font("Segoe UI", 9, FontStyle.Bold), rect, Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
             e.Handled = true;
         }
 
         private void dgvTasks_CellContentClick(object sender, DataGridViewCellEventArgs e) { }
         private void cmbPriority_SelectedIndexChanged(object sender, EventArgs e) { }
+
+        private void lblDescription_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
