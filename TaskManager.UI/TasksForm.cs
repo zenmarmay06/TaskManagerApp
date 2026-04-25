@@ -45,8 +45,17 @@ namespace TaskManager.UI
         {
             if (dgvTasks.Columns["Id"] != null) dgvTasks.Columns["Id"].Visible = false;
             if (dgvTasks.Columns["UserId"] != null) dgvTasks.Columns["UserId"].Visible = false;
-            // Gidugang nato ang IsCompleted sa pag-hide kay Status na atong gamiton
             if (dgvTasks.Columns["IsCompleted"] != null) dgvTasks.Columns["IsCompleted"].Visible = false;
+
+            // I-display ang Note
+            if (dgvTasks.Columns["Note"] != null)
+            {
+                dgvTasks.Columns["Note"].Visible = true;
+                dgvTasks.Columns["Note"].HeaderText = "Special Notes";
+                dgvTasks.Columns["Note"].FillWeight = 150;
+            }
+
+            
         }
 
         private void LoadMaintenanceRooms()
@@ -72,11 +81,12 @@ namespace TaskManager.UI
             TaskItem task = new TaskItem
             {
                 RoomNo = cbRoomNo.Text,
+                Priority = cbPriority.Text,
                 AssignedTo = cbAssigned.Text,
                 DueDate = dtDueDate.Value,
-                Status = "Pending", // Gigamit ang Status string
+                Status = "Pending",
                 UserId = _currentUser.Id,
-                Note = "" // Siguroha nga naay default note
+                Note = txtNote.Text // KINI: Kuhaon ang sulod sa txtNote inig add
             };
 
             _taskService.CreateTask(task);
@@ -104,30 +114,30 @@ namespace TaskManager.UI
         }
 
         //private void btnCompleteTask_Click(object sender, EventArgs e)
-       // {
-           // if (dgvTasks.SelectedRows.Count == 0)
-           // {
-              //  MessageBox.Show("Select a task first");
-             //   return;
-           // }
+        // {
+        // if (dgvTasks.SelectedRows.Count == 0)
+        // {
+        //  MessageBox.Show("Select a task first");
+        //   return;
+        // }
 
-           // var row = dgvTasks.SelectedRows[0];
-           // int taskId = Convert.ToInt32(row.Cells["Id"].Value);
-           // string roomNo = row.Cells["RoomNo"].Value?.ToString();
+        // var row = dgvTasks.SelectedRows[0];
+        // int taskId = Convert.ToInt32(row.Cells["Id"].Value);
+        // string roomNo = row.Cells["RoomNo"].Value?.ToString();
 
-            // 1. Mark as completed sa Task Manager
-           // _taskService.CompleteTask(taskId);
+        // 1. Mark as completed sa Task Manager
+        // _taskService.CompleteTask(taskId);
 
-            // 2. I-update ang Room balik sa 'Available' sa Hotel System
-            //if (!string.IsNullOrEmpty(roomNo))
-           // {
-               // _taskService.UpdateRoomToAvailable(roomNo);
-                //MessageBox.Show($"Room {roomNo} is now Available for booking!");
-           // }
+        // 2. I-update ang Room balik sa 'Available' sa Hotel System
+        //if (!string.IsNullOrEmpty(roomNo))
+        // {
+        // _taskService.UpdateRoomToAvailable(roomNo);
+        //MessageBox.Show($"Room {roomNo} is now Available for booking!");
+        // }
 
-           // LoadTasks();
-            //LoadMaintenanceRooms();
-            //OnTaskChanged?.Invoke();
+        // LoadTasks();
+        //LoadMaintenanceRooms();
+        //OnTaskChanged?.Invoke();
 
         //}
 
@@ -139,31 +149,29 @@ namespace TaskManager.UI
                 return;
             }
 
-            _isEditing = true;
             var row = dgvTasks.SelectedRows[0];
             int taskId = Convert.ToInt32(row.Cells["Id"].Value);
 
-            // Kuhaa ang kasamtangan nga Status ug Note para dili ma-blank
-            string currentStatus = row.Cells["Status"].Value?.ToString() ?? "Pending";
-            string currentNote = row.Cells["Note"].Value?.ToString() ?? "";
-
-            DateTime currentDueDate = Convert.ToDateTime(row.Cells["DueDate"].Value);
-            DateTime newDueDate = _isDateManuallyChanged ? dtDueDate.Value.Date : currentDueDate;
+            _isEditing = true;
 
             TaskItem updatedTask = new TaskItem
             {
                 Id = taskId,
                 RoomNo = cbRoomNo.Text,
-                AssignedTo = cbAssigned.Text, // Siguroha nga naay sulod ang cbAssigned
-                DueDate = newDueDate,
-                Status = currentStatus, // KINI ANG IMPORTANTE
+                Priority = cbPriority.Text,
+                AssignedTo = cbAssigned.Text,
+                DueDate = dtDueDate.Value,
+                Status = row.Cells["Status"].Value?.ToString() ?? "Pending",
                 UserId = _currentUser.Id,
-                Note = currentNote      // KINI SAB
+
+                // ✅ FIXED
+                Note = txtNote.Text
             };
 
             _taskService.UpdateTask(updatedTask);
 
             LoadTasks();
+
             _isEditing = false;
             _isDateManuallyChanged = false;
 
@@ -173,18 +181,33 @@ namespace TaskManager.UI
 
         private void dgvTasks_SelectionChanged(object sender, EventArgs e)
         {
-            if (_isEditing || dgvTasks.SelectedRows.Count == 0) return;
+            if (_isEditing) return;
+
+            if (dgvTasks.CurrentRow == null) return;
 
             _isUpdatingFromGrid = true;
-            var row = dgvTasks.SelectedRows[0];
 
-            // I-populate ang controls base sa napili nga row
-            cbRoomNo.Text = row.Cells["RoomNo"].Value?.ToString();
-            cbAssigned.Text = row.Cells["AssignedTo"].Value?.ToString();
-            dtDueDate.Value = Convert.ToDateTime(row.Cells["DueDate"].Value);
+            var row = dgvTasks.CurrentRow;
+
+            try
+            {
+                cbRoomNo.Text = row.Cells["RoomNo"].Value?.ToString();
+                cbPriority.Text = row.Cells["Priority"].Value?.ToString();
+                cbAssigned.Text = row.Cells["AssignedTo"].Value?.ToString();
+
+                if (row.Cells["DueDate"].Value != DBNull.Value)
+                {
+                    dtDueDate.Value = Convert.ToDateTime(row.Cells["DueDate"].Value);
+                }
+
+                txtNote.Text = row.Cells["Note"].Value?.ToString() ?? "";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading data: " + ex.Message);
+            }
 
             _isUpdatingFromGrid = false;
-            _isDateManuallyChanged = false;
         }
 
         private void dtDueDate_ValueChanged(object sender, EventArgs e)
@@ -235,10 +258,9 @@ namespace TaskManager.UI
         {
             if (e.RowIndex < 0) return;
             var row = dgvTasks.Rows[e.RowIndex];
-
-            // Atong i-check ang Status column imbes IsCompleted
             string status = row.Cells["Status"].Value?.ToString() ?? "Pending";
 
+            // 1. Styling base sa Status (Imong karaan nga code)
             if (status == "Complete")
             {
                 row.DefaultCellStyle.ForeColor = Color.Gray;
@@ -248,6 +270,16 @@ namespace TaskManager.UI
             {
                 row.DefaultCellStyle.ForeColor = Color.LightSkyBlue;
                 row.DefaultCellStyle.Font = new Font(dgvTasks.Font, FontStyle.Italic);
+            }
+
+            // 2. KINI: I-hide ang Date Finished kung wala pa nahuman ang task
+            if (dgvTasks.Columns[e.ColumnIndex].Name == "CompletedDate")
+            {
+                if (status != "Complete" || e.Value == null || e.Value == DBNull.Value || Convert.ToDateTime(e.Value) == DateTime.MinValue)
+                {
+                    e.Value = "---"; // Ipakita ra ang dash kung dili pa complete
+                    e.FormattingApplied = true;
+                }
             }
         }
 
@@ -283,6 +315,11 @@ namespace TaskManager.UI
         private void lblDescription_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void dgvTasks_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            dgvTasks_SelectionChanged(sender, e);
         }
     }
 }

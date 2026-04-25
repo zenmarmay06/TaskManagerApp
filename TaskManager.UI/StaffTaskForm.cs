@@ -53,22 +53,20 @@ namespace TaskManager.UI
                 return;
             }
 
-            var row = dgvTasks.SelectedRows[0];
-            int taskId = Convert.ToInt32(row.Cells["Id"].Value);
-            string roomNo = row.Cells["RoomNo"].Value?.ToString();
-            string currentStatus = row.Cells["Status"].Value?.ToString();
+            // KUHAA ANG TASK ITEM OBJECT GIKAN SA ROW
+            var selectedTask = (TaskItem)dgvTasks.SelectedRows[0].DataBoundItem;
 
             // Siguroha nga gi-Accept una ang task sa dili pa i-complete
-            if (currentStatus == "Pending")
+            if (selectedTask.Status == "Pending")
             {
                 MessageBox.Show("You must 'Accept' the task first before completing it.");
                 return;
             }
 
-            // 1. Mark as completed (SQLite + MySQL Sync via TaskService)
-            _taskService.MarkTaskAsComplete(taskId, roomNo);
+            // I-pass ang tibuok object sa Service
+            _taskService.MarkTaskAsComplete(selectedTask);
 
-            MessageBox.Show($"Room {roomNo} maintenance completed! It is now Available in the Hotel System.");
+            MessageBox.Show($"Room {selectedTask.RoomNo} maintenance completed! It is now Available in the Hotel System.");
 
             LoadStaffTasks();
             OnTaskChanged?.Invoke();
@@ -97,13 +95,30 @@ namespace TaskManager.UI
 
         private void dgvTasks_SelectionChanged(object sender, EventArgs e)
         {
-            if (dgvTasks.SelectedRows.Count == 0) return;
+            if (dgvTasks.CurrentRow == null) return;
 
-            var row = dgvTasks.SelectedRows[0];
+            var row = dgvTasks.CurrentRow;
 
-            lblRoomNo.Text = "Room: " + row.Cells["RoomNo"].Value?.ToString();
-            lblDueDate.Text = "Due: " + Convert.ToDateTime(row.Cells["DueDate"].Value).ToShortDateString();
-            txtNote.Text = row.Cells["Note"].Value?.ToString();
+            try
+            {
+                txtRoom.Text = (row.Cells["RoomNo"]?.Value?.ToString() ?? "N/A");
+                txtPriority.Text =  (row.Cells["Priority"]?.Value?.ToString() ?? "N/A");
+
+                if (row.Cells["DueDate"]?.Value != null && row.Cells["DueDate"].Value != DBNull.Value)
+                {
+                    txtDate.Text = Convert.ToDateTime(row.Cells["DueDate"].Value).ToShortDateString();
+                }
+                else
+                {
+                    txtDate.Text = "Due: N/A";
+                }
+
+                txtNote.Text = row.Cells["Note"]?.Value?.ToString() ?? "No notes available";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading task details: " + ex.Message);
+            }
         }
 
         private void StaffTaskForm_Load(object sender, EventArgs e)
@@ -112,6 +127,7 @@ namespace TaskManager.UI
             dgvTasks.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvTasks.RowTemplate.Height = 40;
             dgvTasks.CellFormatting += dgvTasks_CellFormatting;
+            dgvTasks.MultiSelect = false;
         }
 
         private void dgvTasks_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
@@ -130,6 +146,16 @@ namespace TaskManager.UI
                 row.DefaultCellStyle.BackColor = Color.FromArgb(40, 60, 80); // Dark Blue background para klaro
                 row.DefaultCellStyle.ForeColor = Color.White;
             }
+        }
+
+        private void dgvTasks_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            dgvTasks_SelectionChanged(sender, e);
+        }
+
+        private void cbPriority_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
