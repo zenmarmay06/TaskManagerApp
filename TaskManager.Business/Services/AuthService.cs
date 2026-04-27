@@ -1,25 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Newtonsoft.Json;
+using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using TaskManager.Core.Models;
-using TaskManager.Data.Repositories;
 
 namespace TaskManager.Business.Services
 {
     public class AuthService
     {
-        private readonly UserRepository _userRepository;
-
-        public AuthService()
-        {
-            _userRepository = new UserRepository();
-        }
+        private readonly string baseApi = "http://localhost/Hotel-Management-System-main/api/";
+        private readonly HttpClient client = new HttpClient();
 
         public User Login(string username, string password)
         {
-            return _userRepository.GetUser(username, password);
+            var payload = new
+            {
+                username,
+                password
+            };
+
+            var content = new StringContent(
+                JsonConvert.SerializeObject(payload),
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = client.PostAsync(baseApi + "login", content).Result;
+            var json = response.Content.ReadAsStringAsync().Result;
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            if (string.IsNullOrWhiteSpace(json))
+                return null;
+
+            if (json.TrimStart().StartsWith("<"))
+                return null; // HTML error protection
+
+            if (json.Contains("error"))
+                return null;
+
+            return JsonConvert.DeserializeObject<User>(json);
         }
     }
 }
