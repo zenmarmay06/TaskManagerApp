@@ -32,12 +32,24 @@ namespace TaskManager.UI
             LoadTasks();
             LoadMaintenanceRooms();
             LoadCleaners();
+
+
         }
 
         private void LoadTasks()
         {
             dgvTasks.DataSource = null;
-            dgvTasks.DataSource = _taskService.GetUserTasks(_currentUser.Id);
+
+            var tasks = _taskService.GetAllTasks();
+
+            // 🔥 FILTER: only real created tasks
+            var validTasks = tasks
+                .Where(t => t.Id > 0)          // ensure gikan sa DB
+                .Where(t => !string.IsNullOrEmpty(t.RoomNo))
+                .ToList();
+
+            dgvTasks.DataSource = validTasks;
+
             HideColumns();
         }
 
@@ -55,13 +67,12 @@ namespace TaskManager.UI
                 dgvTasks.Columns["Note"].FillWeight = 150;
             }
 
-            
+
         }
 
         private void LoadMaintenanceRooms()
         {
             var rooms = _taskService.GetMaintenanceRooms();
-            cbRoomNo.DataSource = rooms;
         }
 
         private void LoadCleaners()
@@ -72,30 +83,27 @@ namespace TaskManager.UI
         private void btnAddTask_Click(object sender, EventArgs e)
         {
 
-            if (string.IsNullOrEmpty(cbRoomNo.Text))
+            if (string.IsNullOrEmpty(txtRoom.Text)) return;
+
+            // 1. I-check kung ang Room No naa na ba sa Grid (sa tasks list)
+            var existingTasks = (List<TaskItem>)dgvTasks.DataSource;
+            var existingTask = existingTasks.FirstOrDefault(t => t.RoomNo == txtRoom.Text && t.Status != "Complete");
+
+            if (existingTask != null)
             {
-                MessageBox.Show("Please select a room for maintenance.");
-                return;
+                // 2. KUNG NAA NA: Tawgon ang Update/Edit logic
+                existingTask.AssignedTo = cbAssigned.Text;
+                existingTask.Priority = cbPriority.Text;
+                existingTask.Note = txtNote.Text;
+                existingTask.DueDate = dtDueDate.Value;
+
+                _taskService.UpdateTask(existingTask);
+                MessageBox.Show("Task added successfully!");
             }
-
-            TaskItem task = new TaskItem
-            {
-                RoomNo = cbRoomNo.Text,
-                Priority = cbPriority.Text,
-                AssignedTo = cbAssigned.Text,
-                DueDate = dtDueDate.Value,
-                Status = "Pending",
-                UserId = _currentUser.Id,
-                Note = txtNote.Text // KINI: Kuhaon ang sulod sa txtNote inig add
-            };
-
-            _taskService.CreateTask(task);
+            
 
             LoadTasks();
             LoadMaintenanceRooms();
-            OnTaskChanged?.Invoke();
-
-            MessageBox.Show("Task successfully assigned!");
         }
 
         private void btnDeleteTask_Click(object sender, EventArgs e)
@@ -157,7 +165,7 @@ namespace TaskManager.UI
             TaskItem updatedTask = new TaskItem
             {
                 Id = taskId,
-                RoomNo = cbRoomNo.Text,
+                RoomNo = txtRoom.Text,
                 Priority = cbPriority.Text,
                 AssignedTo = cbAssigned.Text,
                 DueDate = dtDueDate.Value,
@@ -191,7 +199,7 @@ namespace TaskManager.UI
 
             try
             {
-                cbRoomNo.Text = row.Cells["RoomNo"].Value?.ToString();
+                txtRoom.Text = row.Cells["RoomNo"].Value?.ToString();
                 cbPriority.Text = row.Cells["Priority"].Value?.ToString();
                 cbAssigned.Text = row.Cells["AssignedTo"].Value?.ToString();
 
@@ -241,12 +249,12 @@ namespace TaskManager.UI
 
         private void txtSearch_TextChanged(object sender, EventArgs e)
         {
-            var tasks = _taskService.GetUserTasks(_currentUser.Id);
+            // Usba kini gikan sa GetUserTasks ngadto sa GetAllTasks para makita tanan sa Admin
+            var tasks = _taskService.GetAllTasks();
             string search = txtSearch.Text.ToLower();
 
             var filtered = tasks
-                .Where(t =>
-                            (t.RoomNo ?? "").ToLower().Contains(search))
+                .Where(t => (t.RoomNo ?? "").ToLower().Contains(search))
                 .ToList();
 
             dgvTasks.DataSource = null;
@@ -320,6 +328,25 @@ namespace TaskManager.UI
         private void dgvTasks_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             dgvTasks_SelectionChanged(sender, e);
+        }
+
+        private void cbRoomNo_Enter(object sender, EventArgs e)
+        {
+            //LoadMaintenanceRooms();
+        }
+
+        private void pbRefresh_Click(object sender, EventArgs e)
+        {
+            // I-refresh ang Grid (dgvTasks)
+            LoadTasks();
+
+            // I-refresh ang ComboBox (cbRoomNo)
+            LoadMaintenanceRooms();
+
+            // I-refresh sab ang Staff list para sigurado
+            LoadCleaners();
+
+            MessageBox.Show("Data refreshed from server!");
         }
     }
 }
