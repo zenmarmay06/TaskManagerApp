@@ -28,26 +28,33 @@ namespace TaskManager.UI
 
         private void LoadDashboard()
         {
-            // Pagkuha sa tasks gikan sa Service
-            var tasks = _taskService.GetUserTasks(_currentUser.Id);
+            List<TaskItem> tasks;
+
+            // Check kung Admin ba ang naka-login
+            if (_currentUser.Role == "Admin")
+            {
+                // Kung admin, kuhaa ang tanang tasks (overall)
+                tasks = _taskService.GetAllTasks();
+            }
+            else
+            {
+                // Kung staff, iyang kaugalingon ra nga tasks
+                tasks = _taskService.GetUserTasks(_currentUser.Id);
+            }
 
             // Display Welcome Message
-            lblWelcome.Text = "Welcome, " + _currentUser.Name; // Mas maayo Name para professional
+            lblWelcome.Text = $"Welcome, {_currentUser.Role}: {_currentUser.Name}";
 
-            // 1. Total Tasks
-            lblTotalTasks.Text = "Total: " + tasks.Count();
+            // 1. Total Tasks (Overall na kini kung Admin)
+            lblTotalTasks.Text = "Total: " + tasks.Count;
 
-            // 2. Completed Tasks (Base sa string status)
+            // 2. Completed Tasks
             lblCompletedTasks.Text = "Completed: " + tasks.Count(t => t.Status == "Complete");
 
-            // 3. Pending Tasks (Wala pa nasugdan)
+            // 3. Pending Tasks
             lblPendingTasks.Text = "Pending: " + tasks.Count(t => t.Status == "Pending");
 
-            // 4. In Progress (Kadtong gidawat na sa staff)
-            // Note: Kung wala pa kay label para ani, pwede nimo i-add sa UI
-            // lblInProgress.Text = "In Progress: " + tasks.Count(t => t.Status == "In Progress");
-
-            // 5. Overdue (Wala pa nahuman ug lapas na sa Due Date)
+            // 4. Overdue
             lblOverdue.Text = "Overdue: " + tasks.Count(t =>
                 t.Status != "Complete" &&
                 t.DueDate.Date < DateTime.Today
@@ -55,17 +62,22 @@ namespace TaskManager.UI
         }
         private void btnTasks_Click(object sender, EventArgs e)
         {
+            // 1. I-hide ang current dashboard form
+            this.Hide();
+
             TasksForm tasksForm = new TasksForm(_currentUser);
 
-            // Inig close sa TasksForm o naay nausab, i-refresh ang dashboard
-            tasksForm.OnTaskChanged += () =>
-            {
-                LoadDashboard();
-            };
+            // I-refresh ang dashboard data kung naay nausab sa tasks
+            tasksForm.OnTaskChanged += () => { LoadDashboard(); };
 
-            tasksForm.Show();
+            // 2. I-show ang TasksForm isip Dialog
+            // Ang code mohunong diri hangtod i-close sa user ang TasksForm
+            tasksForm.ShowDialog();
+
+            // 3. Inig close sa TasksForm, mo-pakita na sab ang DashboardForm
+            this.Show();
         }
-       
+
         private void DashboardForm_Load(object sender, EventArgs e)
         {
 
@@ -75,13 +87,20 @@ namespace TaskManager.UI
 
         private void btnLogout_Click(object sender, EventArgs e)
         {
+
             LoginForm login = new LoginForm();
             login.Show();
-            this.Close();
+
+            // Hide lang ang dashboard imbes i-close dayon 
+            // aron dili ma-shutdown ang app kung kini ang main form
+            this.Hide();
         }
 
- 
+        private void button1_Click(object sender, EventArgs e)
+        {
+           
         }
     }
+}
 
 

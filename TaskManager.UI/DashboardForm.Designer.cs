@@ -48,9 +48,10 @@
             btnTasks.BackColor = Color.FromArgb(234, 46, 82);
             btnTasks.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 162);
             btnTasks.ForeColor = Color.White;
-            btnTasks.Location = new Point(28, 470);
+            btnTasks.Location = new Point(46, 353);
+            btnTasks.Margin = new Padding(3, 2, 3, 2);
             btnTasks.Name = "btnTasks";
-            btnTasks.Size = new Size(201, 47);
+            btnTasks.Size = new Size(176, 35);
             btnTasks.TabIndex = 0;
             btnTasks.Text = "View Tasks";
             btnTasks.UseVisualStyleBackColor = false;
@@ -61,47 +62,45 @@
             lblWelcome.BackColor = Color.FromArgb(39, 39, 42);
             lblWelcome.Font = new Font("Verdana", 22.2F, FontStyle.Regular, GraphicsUnit.Point, 162);
             lblWelcome.ForeColor = Color.White;
-            lblWelcome.Location = new Point(29, 96);
+            lblWelcome.Location = new Point(25, 72);
             lblWelcome.Name = "lblWelcome";
-            lblWelcome.Size = new Size(352, 53);
+            lblWelcome.Size = new Size(308, 40);
             lblWelcome.TabIndex = 1;
-            lblWelcome.Text = "WELCOME";
-          
+            lblWelcome.Text = "WELCOME ADMIN";
             // 
             // lblCompletedTasks
             // 
             lblCompletedTasks.BackColor = Color.Gray;
             lblCompletedTasks.Font = new Font("Verdana", 12F, FontStyle.Regular, GraphicsUnit.Point, 162);
             lblCompletedTasks.ForeColor = Color.White;
-            lblCompletedTasks.Location = new Point(521, 322);
+            lblCompletedTasks.Location = new Point(456, 242);
             lblCompletedTasks.Name = "lblCompletedTasks";
-            lblCompletedTasks.Size = new Size(200, 100);
+            lblCompletedTasks.Size = new Size(175, 75);
             lblCompletedTasks.TabIndex = 2;
             lblCompletedTasks.Text = "Completed Tasks";
             lblCompletedTasks.TextAlign = ContentAlignment.MiddleCenter;
-
             // 
             // lblPendingTasks
             // 
             lblPendingTasks.BackColor = Color.Gray;
             lblPendingTasks.Font = new Font("Verdana", 12F, FontStyle.Regular, GraphicsUnit.Point, 162);
             lblPendingTasks.ForeColor = Color.Transparent;
-            lblPendingTasks.Location = new Point(268, 322);
+            lblPendingTasks.Location = new Point(234, 242);
             lblPendingTasks.Name = "lblPendingTasks";
-            lblPendingTasks.Size = new Size(200, 100);
+            lblPendingTasks.Size = new Size(175, 75);
             lblPendingTasks.TabIndex = 2;
             lblPendingTasks.Text = "Pending Tasks";
             lblPendingTasks.TextAlign = ContentAlignment.MiddleCenter;
-         
             // 
             // btnLogout
             // 
             btnLogout.BackColor = Color.FromArgb(234, 46, 82);
             btnLogout.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 162);
             btnLogout.ForeColor = Color.White;
-            btnLogout.Location = new Point(837, 12);
+            btnLogout.Location = new Point(732, 9);
+            btnLogout.Margin = new Padding(3, 2, 3, 2);
             btnLogout.Name = "btnLogout";
-            btnLogout.Size = new Size(144, 48);
+            btnLogout.Size = new Size(126, 36);
             btnLogout.TabIndex = 3;
             btnLogout.Text = "Logout";
             btnLogout.UseVisualStyleBackColor = false;
@@ -112,13 +111,12 @@
             lblOverdue.BackColor = Color.Gray;
             lblOverdue.Font = new Font("Verdana", 12F, FontStyle.Regular, GraphicsUnit.Point, 162);
             lblOverdue.ForeColor = Color.White;
-            lblOverdue.Location = new Point(781, 322);
+            lblOverdue.Location = new Point(683, 242);
             lblOverdue.Name = "lblOverdue";
-            lblOverdue.Size = new Size(200, 100);
+            lblOverdue.Size = new Size(175, 75);
             lblOverdue.TabIndex = 2;
             lblOverdue.Text = "Overdue Tasks";
             lblOverdue.TextAlign = ContentAlignment.MiddleCenter;
-     
             // 
             // lblTotalTasks
             // 
@@ -127,13 +125,12 @@
             lblTotalTasks.Font = new Font("Verdana", 12F, FontStyle.Regular, GraphicsUnit.Point, 162);
             lblTotalTasks.ForeColor = Color.White;
             lblTotalTasks.ImageAlign = ContentAlignment.MiddleLeft;
-            lblTotalTasks.Location = new Point(29, 322);
+            lblTotalTasks.Location = new Point(25, 242);
             lblTotalTasks.Name = "lblTotalTasks";
-            lblTotalTasks.Size = new Size(200, 100);
+            lblTotalTasks.Size = new Size(175, 75);
             lblTotalTasks.TabIndex = 2;
             lblTotalTasks.Text = "Total Tasks";
             lblTotalTasks.TextAlign = ContentAlignment.MiddleCenter;
-           
             // 
             // panel1
             // 
@@ -142,16 +139,18 @@
             panel1.Controls.Add(btnLogout);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
+            panel1.Margin = new Padding(3, 2, 3, 2);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1058, 66);
+            panel1.Size = new Size(926, 50);
             panel1.TabIndex = 4;
             // 
             // pictureBox1
             // 
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(29, 8);
+            pictureBox1.Location = new Point(25, 6);
+            pictureBox1.Margin = new Padding(3, 2, 3, 2);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(52, 52);
+            pictureBox1.Size = new Size(46, 39);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 5;
             pictureBox1.TabStop = false;
@@ -160,18 +159,18 @@
             // 
             lblTaskManagerApp.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 162);
             lblTaskManagerApp.ForeColor = Color.White;
-            lblTaskManagerApp.Location = new Point(87, 10);
+            lblTaskManagerApp.Location = new Point(76, 8);
             lblTaskManagerApp.Name = "lblTaskManagerApp";
-            lblTaskManagerApp.Size = new Size(235, 50);
+            lblTaskManagerApp.Size = new Size(206, 38);
             lblTaskManagerApp.TabIndex = 4;
             lblTaskManagerApp.Text = "Task Manager";
             // 
             // DashboardForm
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(39, 39, 42);
-            ClientSize = new Size(1058, 560);
+            ClientSize = new Size(926, 420);
             Controls.Add(panel1);
             Controls.Add(lblWelcome);
             Controls.Add(lblOverdue);
@@ -180,7 +179,9 @@
             Controls.Add(lblCompletedTasks);
             Controls.Add(btnTasks);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(3, 2, 3, 2);
             Name = "DashboardForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "DashboardForm";
             Load += DashboardForm_Load;
             panel1.ResumeLayout(false);
@@ -201,6 +202,5 @@
         private Panel panel1;
         private Label lblTaskManagerApp;
         private PictureBox pictureBox1;
-     
     }
 }

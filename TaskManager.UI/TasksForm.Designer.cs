@@ -29,46 +29,39 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TasksForm));
-            txtDescription = new TextBox();
             btnAddTask = new Button();
             dtDueDate = new DateTimePicker();
             dgvTasks = new DataGridView();
-            btnCompleteTask = new Button();
             btnDeleteTask = new Button();
             txtSearch = new TextBox();
             btnEditTask = new Button();
-            lblTitle = new Label();
-            lblDescription = new Label();
             lblDueDate = new Label();
-            cmbPriority = new ComboBox();
             panel1 = new Panel();
             lblTasksText = new Label();
             pictureBox1 = new PictureBox();
-            txtTitle = new TextBox();
-            lblPriority = new Label();
+            label1 = new Label();
+            cbAssigned = new ComboBox();
+            label2 = new Label();
+            txtNote = new TextBox();
+            label3 = new Label();
+            label4 = new Label();
+            cbPriority = new ComboBox();
+            pbRefresh = new PictureBox();
+            txtRoom = new TextBox();
             ((System.ComponentModel.ISupportInitialize)dgvTasks).BeginInit();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbRefresh).BeginInit();
             SuspendLayout();
-            // 
-            // txtDescription
-            // 
-            txtDescription.BackColor = Color.FromArgb(30, 30, 30);
-            txtDescription.ForeColor = Color.White;
-            txtDescription.Location = new Point(1068, 300);
-            txtDescription.Multiline = true;
-            txtDescription.Name = "txtDescription";
-            txtDescription.ScrollBars = ScrollBars.Vertical;
-            txtDescription.Size = new Size(283, 80);
-            txtDescription.TabIndex = 0;
             // 
             // btnAddTask
             // 
             btnAddTask.BackColor = Color.FromArgb(39, 39, 42);
             btnAddTask.ForeColor = Color.White;
-            btnAddTask.Location = new Point(1072, 558);
+            btnAddTask.Location = new Point(932, 458);
+            btnAddTask.Margin = new Padding(3, 2, 3, 2);
             btnAddTask.Name = "btnAddTask";
-            btnAddTask.Size = new Size(125, 35);
+            btnAddTask.Size = new Size(109, 26);
             btnAddTask.TabIndex = 1;
             btnAddTask.Text = "Add Task";
             btnAddTask.UseVisualStyleBackColor = false;
@@ -81,45 +74,36 @@
             dtDueDate.CalendarTitleBackColor = Color.FromArgb(224, 224, 224);
             dtDueDate.CalendarTitleForeColor = Color.Gray;
             dtDueDate.CalendarTrailingForeColor = Color.DimGray;
-            dtDueDate.Location = new Point(1068, 432);
+            dtDueDate.Location = new Point(932, 280);
+            dtDueDate.Margin = new Padding(3, 2, 3, 2);
             dtDueDate.Name = "dtDueDate";
-            dtDueDate.Size = new Size(287, 27);
+            dtDueDate.Size = new Size(252, 23);
             dtDueDate.TabIndex = 2;
-           
             // 
             // dgvTasks
             // 
             dgvTasks.BackgroundColor = SystemColors.ActiveCaptionText;
             dgvTasks.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvTasks.Location = new Point(29, 132);
+            dgvTasks.Location = new Point(25, 99);
+            dgvTasks.Margin = new Padding(3, 2, 3, 2);
             dgvTasks.MultiSelect = false;
             dgvTasks.Name = "dgvTasks";
             dgvTasks.RowHeadersWidth = 51;
             dgvTasks.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvTasks.Size = new Size(1012, 513);
+            dgvTasks.Size = new Size(886, 385);
             dgvTasks.TabIndex = 3;
+            dgvTasks.CellClick += dgvTasks_CellClick;
             dgvTasks.CellContentClick += dgvTasks_CellContentClick;
             dgvTasks.CellFormatting += dgvTasks_CellFormatting;
-            // 
-            // btnCompleteTask
-            // 
-            btnCompleteTask.BackColor = Color.FromArgb(39, 39, 42);
-            btnCompleteTask.ForeColor = Color.White;
-            btnCompleteTask.Location = new Point(1072, 610);
-            btnCompleteTask.Name = "btnCompleteTask";
-            btnCompleteTask.Size = new Size(125, 35);
-            btnCompleteTask.TabIndex = 4;
-            btnCompleteTask.Text = "Complete Task";
-            btnCompleteTask.UseVisualStyleBackColor = false;
-            btnCompleteTask.Click += btnCompleteTask_Click;
             // 
             // btnDeleteTask
             // 
             btnDeleteTask.BackColor = Color.FromArgb(39, 39, 42);
             btnDeleteTask.ForeColor = Color.White;
-            btnDeleteTask.Location = new Point(1223, 610);
+            btnDeleteTask.Location = new Point(1071, 458);
+            btnDeleteTask.Margin = new Padding(3, 2, 3, 2);
             btnDeleteTask.Name = "btnDeleteTask";
-            btnDeleteTask.Size = new Size(125, 35);
+            btnDeleteTask.Size = new Size(109, 26);
             btnDeleteTask.TabIndex = 4;
             btnDeleteTask.Text = "Delete Task";
             btnDeleteTask.UseVisualStyleBackColor = false;
@@ -129,11 +113,12 @@
             // 
             txtSearch.BackColor = Color.FromArgb(30, 30, 30);
             txtSearch.ForeColor = Color.White;
-            txtSearch.Location = new Point(29, 91);
+            txtSearch.Location = new Point(25, 68);
+            txtSearch.Margin = new Padding(3, 2, 3, 2);
             txtSearch.Multiline = true;
             txtSearch.Name = "txtSearch";
             txtSearch.PlaceholderText = "🔍 Search Tasks...";
-            txtSearch.Size = new Size(225, 35);
+            txtSearch.Size = new Size(197, 27);
             txtSearch.TabIndex = 5;
             txtSearch.TextChanged += txtSearch_TextChanged;
             // 
@@ -141,57 +126,25 @@
             // 
             btnEditTask.BackColor = Color.FromArgb(39, 39, 42);
             btnEditTask.ForeColor = Color.White;
-            btnEditTask.Location = new Point(1226, 558);
+            btnEditTask.Location = new Point(1071, 419);
+            btnEditTask.Margin = new Padding(3, 2, 3, 2);
             btnEditTask.Name = "btnEditTask";
-            btnEditTask.Size = new Size(125, 35);
+            btnEditTask.Size = new Size(109, 26);
             btnEditTask.TabIndex = 6;
             btnEditTask.Text = "Edit Task";
             btnEditTask.UseVisualStyleBackColor = false;
             btnEditTask.Click += btnEditTask_Click;
-            // 
-            // lblTitle
-            // 
-            lblTitle.Font = new Font("Segoe UI", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 162);
-            lblTitle.ForeColor = Color.White;
-            lblTitle.Location = new Point(1065, 132);
-            lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(76, 31);
-            lblTitle.TabIndex = 7;
-            lblTitle.Text = "Title";
-            // 
-            // lblDescription
-            // 
-            lblDescription.Font = new Font("Segoe UI", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 162);
-            lblDescription.ForeColor = Color.White;
-            lblDescription.Location = new Point(1065, 267);
-            lblDescription.Name = "lblDescription";
-            lblDescription.Size = new Size(129, 30);
-            lblDescription.TabIndex = 8;
-            lblDescription.Text = "Description";
             // 
             // lblDueDate
             // 
             lblDueDate.AutoSize = true;
             lblDueDate.Font = new Font("Segoe UI", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 162);
             lblDueDate.ForeColor = Color.White;
-            lblDueDate.Location = new Point(1065, 404);
+            lblDueDate.Location = new Point(938, 245);
             lblDueDate.Name = "lblDueDate";
-            lblDueDate.Size = new Size(86, 25);
+            lblDueDate.Size = new Size(72, 20);
             lblDueDate.TabIndex = 8;
             lblDueDate.Text = "Due Date";
-            // 
-            // cmbPriority
-            // 
-            cmbPriority.BackColor = Color.FromArgb(30, 30, 30);
-            cmbPriority.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbPriority.ForeColor = Color.White;
-            cmbPriority.FormattingEnabled = true;
-            cmbPriority.Items.AddRange(new object[] { "Low", "Medium", "High" });
-            cmbPriority.Location = new Point(1068, 510);
-            cmbPriority.Name = "cmbPriority";
-            cmbPriority.Size = new Size(283, 28);
-            cmbPriority.TabIndex = 9;
-            cmbPriority.SelectedIndexChanged += cmbPriority_SelectedIndexChanged;
             // 
             // panel1
             // 
@@ -199,101 +152,183 @@
             panel1.Controls.Add(pictureBox1);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
+            panel1.Margin = new Padding(3, 2, 3, 2);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1772, 85);
+            panel1.Size = new Size(1199, 64);
             panel1.TabIndex = 10;
             // 
             // lblTasksText
             // 
             lblTasksText.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 162);
             lblTasksText.ForeColor = Color.White;
-            lblTasksText.Location = new Point(87, 14);
+            lblTasksText.Location = new Point(76, 10);
             lblTasksText.Name = "lblTasksText";
-            lblTasksText.Size = new Size(235, 50);
+            lblTasksText.Size = new Size(206, 38);
             lblTasksText.TabIndex = 1;
             lblTasksText.Text = "Tasks";
             // 
             // pictureBox1
             // 
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(29, 12);
+            pictureBox1.Location = new Point(25, 9);
+            pictureBox1.Margin = new Padding(3, 2, 3, 2);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(52, 52);
+            pictureBox1.Size = new Size(46, 39);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             // 
-            // txtTitle
+            // label1
             // 
-            txtTitle.BackColor = Color.FromArgb(30, 30, 30);
-            txtTitle.ForeColor = Color.White;
-            txtTitle.Location = new Point(1065, 166);
-            txtTitle.Multiline = true;
-            txtTitle.Name = "txtTitle";
-            txtTitle.ScrollBars = ScrollBars.Vertical;
-            txtTitle.Size = new Size(283, 80);
-            txtTitle.TabIndex = 0;
+            label1.Font = new Font("Segoe UI", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 162);
+            label1.ForeColor = Color.White;
+            label1.Location = new Point(932, 174);
+            label1.Name = "label1";
+            label1.Size = new Size(113, 22);
+            label1.TabIndex = 11;
+            label1.Text = "Assigned to:";
             // 
-            // lblPriority
+            // cbAssigned
             // 
-            lblPriority.AutoSize = true;
-            lblPriority.Font = new Font("Segoe UI", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 162);
-            lblPriority.ForeColor = Color.White;
-            lblPriority.Location = new Point(1068, 482);
-            lblPriority.Name = "lblPriority";
-            lblPriority.Size = new Size(68, 25);
-            lblPriority.TabIndex = 8;
-            lblPriority.Text = "Priority";
+            cbAssigned.BackColor = Color.FromArgb(30, 30, 30);
+            cbAssigned.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbAssigned.ForeColor = Color.White;
+            cbAssigned.FormattingEnabled = true;
+            cbAssigned.Items.AddRange(new object[] { "Low", "Medium", "High" });
+            cbAssigned.Location = new Point(932, 209);
+            cbAssigned.Margin = new Padding(3, 2, 3, 2);
+            cbAssigned.Name = "cbAssigned";
+            cbAssigned.Size = new Size(248, 23);
+            cbAssigned.TabIndex = 12;
+            // 
+            // label2
+            // 
+            label2.Font = new Font("Segoe UI", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 162);
+            label2.ForeColor = Color.White;
+            label2.Location = new Point(932, 99);
+            label2.Name = "label2";
+            label2.Size = new Size(73, 23);
+            label2.TabIndex = 13;
+            label2.Text = "Room no:";
+            // 
+            // txtNote
+            // 
+            txtNote.BackColor = Color.LightGray;
+            txtNote.Location = new Point(932, 344);
+            txtNote.Multiline = true;
+            txtNote.Name = "txtNote";
+            txtNote.Size = new Size(252, 48);
+            txtNote.TabIndex = 30;
+            // 
+            // label3
+            // 
+            label3.Font = new Font("Segoe UI", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 162);
+            label3.ForeColor = Color.White;
+            label3.Location = new Point(932, 318);
+            label3.Name = "label3";
+            label3.Size = new Size(73, 23);
+            label3.TabIndex = 29;
+            label3.Text = "Note:";
+            // 
+            // label4
+            // 
+            label4.Font = new Font("Segoe UI", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 162);
+            label4.ForeColor = Color.White;
+            label4.Location = new Point(1071, 99);
+            label4.Name = "label4";
+            label4.Size = new Size(100, 23);
+            label4.TabIndex = 31;
+            label4.Text = "Priority Level:";
+            // 
+            // cbPriority
+            // 
+            cbPriority.BackColor = Color.FromArgb(30, 30, 30);
+            cbPriority.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbPriority.ForeColor = Color.White;
+            cbPriority.FormattingEnabled = true;
+            cbPriority.Items.AddRange(new object[] { "Low", "Medium", "High" });
+            cbPriority.Location = new Point(1071, 136);
+            cbPriority.Margin = new Padding(3, 2, 3, 2);
+            cbPriority.Name = "cbPriority";
+            cbPriority.Size = new Size(109, 23);
+            cbPriority.TabIndex = 32;
+            // 
+            // pbRefresh
+            // 
+            pbRefresh.Image = Properties.Resources.icons8_refresh_30__1_;
+            pbRefresh.Location = new Point(878, 72);
+            pbRefresh.Margin = new Padding(3, 2, 3, 2);
+            pbRefresh.Name = "pbRefresh";
+            pbRefresh.Size = new Size(22, 23);
+            pbRefresh.SizeMode = PictureBoxSizeMode.Zoom;
+            pbRefresh.TabIndex = 2;
+            pbRefresh.TabStop = false;
+            pbRefresh.Click += pbRefresh_Click;
+            // 
+            // txtRoom
+            // 
+            txtRoom.BackColor = Color.LightGray;
+            txtRoom.Location = new Point(938, 136);
+            txtRoom.Name = "txtRoom";
+            txtRoom.Size = new Size(63, 23);
+            txtRoom.TabIndex = 33;
             // 
             // TasksForm
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(39, 39, 42);
-            ClientSize = new Size(1772, 673);
+            ClientSize = new Size(1199, 505);
+            Controls.Add(txtRoom);
+            Controls.Add(pbRefresh);
+            Controls.Add(cbPriority);
+            Controls.Add(label4);
+            Controls.Add(txtNote);
+            Controls.Add(label3);
+            Controls.Add(label2);
+            Controls.Add(cbAssigned);
+            Controls.Add(label1);
+            Controls.Add(dgvTasks);
             Controls.Add(panel1);
-            Controls.Add(cmbPriority);
-            Controls.Add(lblPriority);
             Controls.Add(lblDueDate);
-            Controls.Add(lblDescription);
-            Controls.Add(lblTitle);
             Controls.Add(btnEditTask);
             Controls.Add(txtSearch);
             Controls.Add(btnDeleteTask);
-            Controls.Add(btnCompleteTask);
-            Controls.Add(dgvTasks);
             Controls.Add(dtDueDate);
             Controls.Add(btnAddTask);
-            Controls.Add(txtTitle);
-            Controls.Add(txtDescription);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(3, 2, 3, 2);
             Name = "TasksForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "TasksForm";
             Load += TasksForm_Load;
             ((System.ComponentModel.ISupportInitialize)dgvTasks).EndInit();
             panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbRefresh).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
-        private TextBox txtDescription;
         private Button btnAddTask;
         private DateTimePicker dtDueDate;
         private DataGridView dgvTasks;
-        private Button btnCompleteTask;
         private Button btnDeleteTask;
         private TextBox txtSearch;
         private Button btnEditTask;
-        private Label lblTitle;
-        private Label lblDescription;
         private Label lblDueDate;
-        private ComboBox cmbPriority;
         private Panel panel1;
         private PictureBox pictureBox1;
         private Label lblTasksText;
-        private TextBox txtTitle;
-        private Label lblPriority;
+        private Label label1;
+        private ComboBox cbAssigned;
+        private Label label2;
+        private TextBox txtNote;
+        private Label label3;
+        private Label label4;
+        private ComboBox cbPriority;
+        private PictureBox pbRefresh;
+        private TextBox txtRoom;
     }
 }

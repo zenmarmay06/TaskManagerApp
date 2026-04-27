@@ -14,14 +14,23 @@ namespace TaskManager.Business.Services
             _taskRepository = new TaskRepository();
         }
 
+        public List<TaskItem> GetAllTasks()
+        {
+            return _taskRepository.GetAllTasks();
+        }
+
         public List<TaskItem> GetUserTasks(int userId)
         {
-            return _taskRepository.GetTasksByUser(userId);
+            return _taskRepository.GetAllTasks()
+                .Where(t => t.UserId == userId)
+                .ToList();
         }
 
         public List<TaskItem> GetStaffTasks(string staffName)
         {
-            return _taskRepository.GetTasksByStaff(staffName);
+            return _taskRepository.GetAllTasks()
+                .Where(t => t.AssignedTo == staffName)
+                .ToList();
         }
 
         public void CreateTask(TaskItem task)
@@ -59,33 +68,33 @@ namespace TaskManager.Business.Services
             // Depende sa imong UI logic
         }
 
-        // 2. Pag-complete sa Task ug pag-update sa Hotel System
-        public void MarkTaskAsComplete(int taskId, string roomNo)
+        // 2. Pag-complete sa Task ug pag-update sa Hotel System
+        public void MarkTaskAsComplete(TaskItem task)
         {
-            if (taskId <= 0) throw new ArgumentException("Invalid task id");
+            if (task == null) throw new ArgumentNullException(nameof(task));
 
-            // I-update ang SQLite status
-            _taskRepository.UpdateTaskStatus(taskId, "Complete");
+            // I-update ang local SQLite status
+            task.Status = "Complete";
+            _taskRepository.UpdateTask(task);
 
-            // IMPORTANTE: I-update ang MySQL Room Status balik sa 'Available'
-            if (!string.IsNullOrEmpty(roomNo))
+            // SYNC: I-update ang MySQL Room Status balik sa 'Available'
+            // Gigamit ang UpdateRoomStatusInHotelSystem para dali nga status flip
+            if (!string.IsNullOrEmpty(task.RoomNo))
             {
-                _taskRepository.UpdateRoomStatusInHotelSystem(roomNo, "Available");
+                _taskRepository.UpdateRoomStatusInHotelSystem(task.RoomNo, "Available");
             }
         }
 
-        // 3. Mokuha sa mga rooms nga naay status nga 'Maintenance' gikan sa MySQL
-        public List<string> GetMaintenanceRooms()
+        // 3. Mokuha sa mga rooms nga naay status nga 'Maintenance' gikan sa MySQL
+        public List<string> GetMaintenanceRooms()
         {
             return _taskRepository.GetRoomsByStatus("Maintenance");
         }
 
-        // 4. Mokuha sa cleaners (Pahinumdom: Siguroha nga naa kay GetStaffByWork sa Repository)
-        public List<string> GetStaffByWork()
+        // 4. Mokuha sa mga cleaners o staff base sa trabaho
+        public List<string> GetStaffByWork(string workType = "Cleaner")
         {
-            // Note: Kung wala pa nimo na-add ang GetStaffByWork sa Repository, 
-            // gamita lang una ang GetRoomsByStatus as pattern.
-            return _taskRepository.GetStaffByWork("Cleaner"); // Pananglitan lang
+            return _taskRepository.GetStaffByWork(workType);
         }
     }
 }

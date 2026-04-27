@@ -168,6 +168,7 @@
             Controls.Add(btnTasks);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "StaffDashboard";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "StaffDashboard";
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);

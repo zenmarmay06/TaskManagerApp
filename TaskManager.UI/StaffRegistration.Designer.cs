@@ -91,7 +91,7 @@
             // 
             // txtUsername
             // 
-            txtUsername.Location = new Point(106, 227);
+            txtUsername.Location = new Point(106, 219);
             txtUsername.Margin = new Padding(3, 2, 3, 2);
             txtUsername.Name = "txtUsername";
             txtUsername.Size = new Size(146, 23);
@@ -128,7 +128,7 @@
             // 
             lblUsername.AutoSize = true;
             lblUsername.ForeColor = Color.White;
-            lblUsername.Location = new Point(106, 210);
+            lblUsername.Location = new Point(106, 202);
             lblUsername.Name = "lblUsername";
             lblUsername.Size = new Size(60, 15);
             lblUsername.TabIndex = 9;
@@ -136,7 +136,7 @@
             // 
             // txtFullname
             // 
-            txtFullname.Location = new Point(106, 162);
+            txtFullname.Location = new Point(106, 154);
             txtFullname.Margin = new Padding(3, 2, 3, 2);
             txtFullname.Name = "txtFullname";
             txtFullname.Size = new Size(146, 23);
@@ -146,7 +146,7 @@
             // 
             label1.AutoSize = true;
             label1.ForeColor = Color.White;
-            label1.Location = new Point(106, 145);
+            label1.Location = new Point(106, 137);
             label1.Name = "label1";
             label1.Size = new Size(59, 15);
             label1.TabIndex = 14;
@@ -170,6 +170,7 @@
             Controls.Add(pictureBox1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "StaffRegistration";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "StaffRegistration";
             Load += StaffRegistration_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();

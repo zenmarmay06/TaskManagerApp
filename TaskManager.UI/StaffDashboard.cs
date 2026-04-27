@@ -56,15 +56,22 @@ namespace TaskManager.UI
 
         private void btnTasks_Click(object sender, EventArgs e)
         {
+            // 1. I-hide ang Staff Dashboard
+            this.Hide();
+
             StaffTaskForm tasksForm = new StaffTaskForm(_currentUser);
 
-            // Inig close sa TasksForm o naay nausab, i-refresh ang dashboard
+            // Inig close sa TasksForm o naay nausab, i-refresh ang dashboard data
             tasksForm.OnTaskChanged += () =>
             {
                 LoadDashboard();
             };
 
-            tasksForm.Show();
+            // 2. Gamita ang ShowDialog aron mohunong ang code diri hangtod i-close ang form
+            tasksForm.ShowDialog();
+
+            // 3. Inig close sa StaffTaskForm, mo-pakita na sab ang Staff Dashboard
+            this.Show();
         }
 
         private void btnLogout_Click(object sender, EventArgs e)

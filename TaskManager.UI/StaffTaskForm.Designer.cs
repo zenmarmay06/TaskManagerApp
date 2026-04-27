@@ -31,18 +31,22 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StaffTaskForm));
             lblTasksText = new Label();
             pictureBox1 = new PictureBox();
-            cbRoomNo = new ComboBox();
             lblRoomNo = new Label();
             dgvTasks = new DataGridView();
             lblDueDate = new Label();
             txtSearch = new TextBox();
             btnCompleteTask = new Button();
-            dtDueDate = new DateTimePicker();
             btnAccept = new Button();
             label1 = new Label();
+            label4 = new Label();
             txtNote = new TextBox();
+            txtRoom = new TextBox();
+            txtPriority = new TextBox();
+            txtDate = new TextBox();
+            pbRefresh = new PictureBox();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgvTasks).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbRefresh).BeginInit();
             SuspendLayout();
             // 
             // lblTasksText
@@ -66,19 +70,6 @@
             pictureBox1.TabIndex = 15;
             pictureBox1.TabStop = false;
             // 
-            // cbRoomNo
-            // 
-            cbRoomNo.BackColor = Color.FromArgb(30, 30, 30);
-            cbRoomNo.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbRoomNo.ForeColor = Color.White;
-            cbRoomNo.FormattingEnabled = true;
-            cbRoomNo.Items.AddRange(new object[] { "Low", "Medium", "High" });
-            cbRoomNo.Location = new Point(927, 142);
-            cbRoomNo.Margin = new Padding(3, 2, 3, 2);
-            cbRoomNo.Name = "cbRoomNo";
-            cbRoomNo.Size = new Size(248, 23);
-            cbRoomNo.TabIndex = 25;
-            // 
             // lblRoomNo
             // 
             lblRoomNo.Font = new Font("Segoe UI", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 162);
@@ -101,6 +92,7 @@
             dgvTasks.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvTasks.Size = new Size(886, 385);
             dgvTasks.TabIndex = 18;
+            dgvTasks.CellClick += dgvTasks_CellClick;
             dgvTasks.CellFormatting += dgvTasks_CellFormatting;
             dgvTasks.SelectionChanged += dgvTasks_SelectionChanged;
             // 
@@ -109,7 +101,7 @@
             lblDueDate.AutoSize = true;
             lblDueDate.Font = new Font("Segoe UI", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 162);
             lblDueDate.ForeColor = Color.White;
-            lblDueDate.Location = new Point(927, 196);
+            lblDueDate.Location = new Point(933, 177);
             lblDueDate.Name = "lblDueDate";
             lblDueDate.Size = new Size(72, 20);
             lblDueDate.TabIndex = 21;
@@ -131,7 +123,7 @@
             // 
             btnCompleteTask.BackColor = Color.FromArgb(39, 39, 42);
             btnCompleteTask.ForeColor = Color.White;
-            btnCompleteTask.Location = new Point(1070, 452);
+            btnCompleteTask.Location = new Point(1068, 410);
             btnCompleteTask.Margin = new Padding(3, 2, 3, 2);
             btnCompleteTask.Name = "btnCompleteTask";
             btnCompleteTask.Size = new Size(109, 26);
@@ -140,24 +132,11 @@
             btnCompleteTask.UseVisualStyleBackColor = false;
             btnCompleteTask.Click += btnCompleteTask_Click;
             // 
-            // dtDueDate
-            // 
-            dtDueDate.CalendarForeColor = SystemColors.InfoText;
-            dtDueDate.CalendarMonthBackground = Color.White;
-            dtDueDate.CalendarTitleBackColor = Color.FromArgb(224, 224, 224);
-            dtDueDate.CalendarTitleForeColor = Color.Gray;
-            dtDueDate.CalendarTrailingForeColor = Color.DimGray;
-            dtDueDate.Location = new Point(927, 236);
-            dtDueDate.Margin = new Padding(3, 2, 3, 2);
-            dtDueDate.Name = "dtDueDate";
-            dtDueDate.Size = new Size(252, 23);
-            dtDueDate.TabIndex = 17;
-            // 
             // btnAccept
             // 
             btnAccept.BackColor = Color.FromArgb(39, 39, 42);
             btnAccept.ForeColor = Color.White;
-            btnAccept.Location = new Point(933, 452);
+            btnAccept.Location = new Point(927, 410);
             btnAccept.Margin = new Padding(3, 2, 3, 2);
             btnAccept.Name = "btnAccept";
             btnAccept.Size = new Size(109, 26);
@@ -170,20 +149,66 @@
             // 
             label1.Font = new Font("Segoe UI", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 162);
             label1.ForeColor = Color.White;
-            label1.Location = new Point(927, 288);
+            label1.Location = new Point(925, 249);
             label1.Name = "label1";
             label1.Size = new Size(73, 23);
             label1.TabIndex = 27;
             label1.Text = "Note:";
             // 
+            // label4
+            // 
+            label4.Font = new Font("Segoe UI", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 162);
+            label4.ForeColor = Color.White;
+            label4.Location = new Point(1047, 105);
+            label4.Name = "label4";
+            label4.Size = new Size(100, 23);
+            label4.TabIndex = 33;
+            label4.Text = "Priority Level:";
+            // 
             // txtNote
             // 
             txtNote.BackColor = Color.LightGray;
-            txtNote.Location = new Point(927, 324);
+            txtNote.Location = new Point(925, 288);
             txtNote.Multiline = true;
             txtNote.Name = "txtNote";
-            txtNote.Size = new Size(252, 79);
-            txtNote.TabIndex = 28;
+            txtNote.Size = new Size(252, 88);
+            txtNote.TabIndex = 37;
+            // 
+            // txtRoom
+            // 
+            txtRoom.BackColor = Color.LightGray;
+            txtRoom.Location = new Point(930, 131);
+            txtRoom.Name = "txtRoom";
+            txtRoom.Size = new Size(68, 23);
+            txtRoom.TabIndex = 38;
+            // 
+            // txtPriority
+            // 
+            txtPriority.BackColor = Color.LightGray;
+            txtPriority.Location = new Point(1047, 131);
+            txtPriority.Name = "txtPriority";
+            txtPriority.Size = new Size(68, 23);
+            txtPriority.TabIndex = 39;
+            // 
+            // txtDate
+            // 
+            txtDate.BackColor = Color.LightGray;
+            txtDate.Location = new Point(930, 213);
+            txtDate.Name = "txtDate";
+            txtDate.Size = new Size(227, 23);
+            txtDate.TabIndex = 40;
+            // 
+            // pbRefresh
+            // 
+            pbRefresh.Image = Properties.Resources.icons8_refresh_30__1_;
+            pbRefresh.Location = new Point(884, 74);
+            pbRefresh.Margin = new Padding(3, 2, 3, 2);
+            pbRefresh.Name = "pbRefresh";
+            pbRefresh.Size = new Size(22, 23);
+            pbRefresh.SizeMode = PictureBoxSizeMode.Zoom;
+            pbRefresh.TabIndex = 41;
+            pbRefresh.TabStop = false;
+            pbRefresh.Click += pbRefresh_Click;
             // 
             // StaffTaskForm
             // 
@@ -191,24 +216,29 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(39, 39, 42);
             ClientSize = new Size(1199, 505);
+            Controls.Add(pbRefresh);
+            Controls.Add(txtDate);
+            Controls.Add(txtPriority);
+            Controls.Add(txtRoom);
             Controls.Add(txtNote);
+            Controls.Add(label4);
             Controls.Add(label1);
             Controls.Add(btnAccept);
             Controls.Add(lblTasksText);
             Controls.Add(pictureBox1);
-            Controls.Add(cbRoomNo);
             Controls.Add(lblRoomNo);
             Controls.Add(dgvTasks);
             Controls.Add(lblDueDate);
             Controls.Add(txtSearch);
             Controls.Add(btnCompleteTask);
-            Controls.Add(dtDueDate);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "StaffTaskForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "StaffTaskForm";
             Load += StaffTaskForm_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)dgvTasks).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbRefresh).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -217,15 +247,18 @@
 
         private Label lblTasksText;
         private PictureBox pictureBox1;
-        private ComboBox cbRoomNo;
         private Label lblRoomNo;
         private DataGridView dgvTasks;
         private Label lblDueDate;
         private TextBox txtSearch;
         private Button btnCompleteTask;
-        private DateTimePicker dtDueDate;
         private Button btnAccept;
         private Label label1;
+        private Label label4;
         private TextBox txtNote;
+        private TextBox txtRoom;
+        private TextBox txtPriority;
+        private TextBox txtDate;
+        private PictureBox pbRefresh;
     }
 }
