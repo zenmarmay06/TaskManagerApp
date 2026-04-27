@@ -102,7 +102,7 @@ namespace TaskManager.UI
             try
             {
                 txtRoom.Text = (row.Cells["RoomNo"]?.Value?.ToString() ?? "N/A");
-                txtPriority.Text =  (row.Cells["Priority"]?.Value?.ToString() ?? "N/A");
+                txtPriority.Text = (row.Cells["Priority"]?.Value?.ToString() ?? "N/A");
 
                 if (row.Cells["DueDate"]?.Value != null && row.Cells["DueDate"].Value != DBNull.Value)
                 {
@@ -156,6 +156,16 @@ namespace TaskManager.UI
         private void cbPriority_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void pbRefresh_Click(object sender, EventArgs e)
+        {
+            // I-refresh ang Grid (dgvTasks)
+            LoadStaffTasks();
+
+           
+
+            MessageBox.Show("Data refreshed from server!");
         }
     }
 }
