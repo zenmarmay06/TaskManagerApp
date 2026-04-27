@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.SQLite;
-
+using MySql.Data.MySqlClient;
+using BCrypt.Net;
 
 namespace TaskManager.Data.Database
 {
@@ -15,43 +11,64 @@ namespace TaskManager.Data.Database
             using var connection = DatabaseManager.GetConnection();
             connection.Open();
 
+            // =========================
+            // USERS TABLE (MYSQL)
+            // =========================
             string createUsersTable = @"
-            CREATE TABLE IF NOT EXISTS Users (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Username TEXT NOT NULL UNIQUE,
-                Password TEXT NOT NULL,
-                Role TEXT NOT NULL
-            );";
+CREATE TABLE IF NOT EXISTS users (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100),
+    Username VARCHAR(100) NOT NULL UNIQUE,
+    Password VARCHAR(255) NOT NULL,
+    Role VARCHAR(20) NOT NULL
+);";
 
+            // =========================
+            // TASKS TABLE (MYSQL)
+            // =========================
             string createTasksTable = @"
-            CREATE TABLE IF NOT EXISTS Tasks (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Title TEXT NOT NULL,
-                Description TEXT,
-                DueDate TEXT,
-                IsCompleted INTEGER,
-                UserId INTEGER,
-                Priority TEXT
-            );";
+CREATE TABLE IF NOT EXISTS tasks (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    RoomNo VARCHAR(50),
+    Priority VARCHAR(20),
+    AssignedTo VARCHAR(100),
+    DueDate DATE,
+    CompleteDate DATE,
+    Status VARCHAR(20) DEFAULT 'Pending',
+    UserId INT,
+    Note TEXT
+);";
 
-            new SQLiteCommand(createUsersTable, connection).ExecuteNonQuery();
-            new SQLiteCommand(createTasksTable, connection).ExecuteNonQuery();
+            new MySqlCommand(createUsersTable, connection).ExecuteNonQuery();
+            new MySqlCommand(createTasksTable, connection).ExecuteNonQuery();
 
-            // 🔥 Eski DB'ler için (Priority kolonu yoksa ekler)
-            try
+            // =========================
+            // CHECK ADMIN COUNT
+            // =========================
+            string checkAdmin = "SELECT COUNT(*) FROM users WHERE Role='Admin'";
+            using var checkCmd = new MySqlCommand(checkAdmin, connection);
+            long adminCount = Convert.ToInt64(checkCmd.ExecuteScalar());
+
+            // =========================
+            // DEFAULT ADMIN (ONLY ONCE)
+            // =========================
+            if (adminCount == 0)
             {
-                new SQLiteCommand("ALTER TABLE Tasks ADD COLUMN Priority TEXT;", connection).ExecuteNonQuery();
-            }
-            catch
-            {
-                // zaten varsa hata verir → ignore
-            }
+                string adminHashedPassword =
+                    BCrypt.Net.BCrypt.HashPassword("admin123");
 
-            string insertAdmin = @"
-            INSERT OR IGNORE INTO Users (Id, Username, Password, Role)
-            VALUES (1, 'admin', 'admin123', 'Admin');";
+                string insertAdmin = @"
+INSERT INTO users (Name, Username, Password, Role)
+VALUES (@name, @username, @password, @role);";
 
-            new SQLiteCommand(insertAdmin, connection).ExecuteNonQuery();
+                using var insertCmd = new MySqlCommand(insertAdmin, connection);
+                insertCmd.Parameters.AddWithValue("@name", "Administrator");
+                insertCmd.Parameters.AddWithValue("@username", "admin");
+                insertCmd.Parameters.AddWithValue("@password", adminHashedPassword);
+                insertCmd.Parameters.AddWithValue("@role", "Admin");
+
+                insertCmd.ExecuteNonQuery();
+            }
         }
     }
 }

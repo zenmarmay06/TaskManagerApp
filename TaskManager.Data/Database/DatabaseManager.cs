@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.SQLite;
+using MySql.Data.MySqlClient;
 
 namespace TaskManager.Data.Database
 {
     public static class DatabaseManager
     {
-        private static string connectionString = "Data Source=taskmanager.db";
+        // 🔥 MySQL Connection String (EDIT NI BASE SA IMONG XAMPP)
+        private static string connectionString =
+            "server=localhost;database=bluebirdhotel;uid=root;pwd=;";
 
-        public static SQLiteConnection GetConnection()
+        public static MySqlConnection GetConnection()
         {
-            return new SQLiteConnection(connectionString);
+            return new MySqlConnection(connectionString);
         }
     }
 }
